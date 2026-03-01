@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>message</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Sarabun:wght@300;400&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0c0c0c;
+      color: #cccccc;
+      font-family: 'Share Tech Mono', 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .window {
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    .titlebar {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      padding: 5px 10px;
+      font-size: 12px;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .terminal {
+      background: #0c0c0c;
+      border: 1px solid #333;
+      border-top: none;
+      padding: 20px 16px;
+    }
+
+    .line {
+      margin-bottom: 4px;
+    }
+
+    .line.gap {
+      margin-bottom: 14px;
+    }
+
+    .line.gap2 {
+      margin-bottom: 24px;
+    }
+
+    .prompt {
+      color: #4ec94e;
+    }
+
+    .dim {
+      color: #555;
+    }
+
+    .white {
+      color: #e0e0e0;
+    }
+
+    .yellow {
+      color: #d4a017;
+    }
+
+    /* Greeting */
+    .greeting {
+      font-family: 'Sarabun', sans-serif;
+      font-size: clamp(20px, 6vw, 32px);
+      color: #e0e0e0;
+      margin: 8px 0 4px;
+      letter-spacing: 1px;
+    }
+
+    /* Message box */
+    .msg-body {
+      border-left: 2px solid #2a2a2a;
+      padding: 12px 16px;
+      margin: 8px 0;
+      background: #0f0f0f;
+    }
+
+    .msg-text {
+      font-family: 'Sarabun', sans-serif;
+      font-size: 15px;
+      line-height: 2;
+      color: #d0d0d0;
+      white-space: pre-wrap;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 15px;
+      background: #4ec94e;
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    /* Divider */
+    .divider {
+      border: none;
+      border-top: 1px solid #1e1e1e;
+      margin: 20px 0;
+    }
+
+    /* Contact */
+    .contact-block {
+      margin-top: 4px;
+    }
+
+    .contact-name {
+      color: #e0e0e0;
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #aaa;
+      font-size: 13px;
+      padding: 4px 0;
+      border-bottom: 1px solid #161616;
+      transition: color 0.15s;
+    }
+
+    .contact-link:hover {
+      color: #e0e0e0;
+    }
+
+    .contact-link .lbl {
+      color: #555;
+      min-width: 68px;
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+
+    /* Status bar */
+    .statusbar {
+      border-top: 1px solid #1e1e1e;
+      margin-top: 20px;
+      padding-top: 8px;
+      font-size: 11px;
+      color: #444;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    /* Hidden until done */
+    .hidden {
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <script src="config.js"></script>
+
+  <div class="window">
+    <div class="titlebar">
+      <span>C:\access\message.txt</span>
+      <span id="ts">--</span>
+    </div>
+
+    <div class="terminal">
+
+      <div class="line dim">Reading file...</div>
+      <div class="line gap dim">Decrypting personal message...</div>
+
+      <!-- Greeting -->
+      <div class="line dim">Recipient:</div>
+      <div class="greeting" id="greeting">---</div>
+      <div class="line gap dim" id="code-label"></div>
+
+      <!-- Message -->
+      <div class="line"><span class="prompt">C:\access&gt;</span> <span class="white">type message.txt</span></div>
+      <div class="msg-body">
+        <div class="msg-text" id="msg-text"></div><span class="cursor" id="cursor"></span>
+      </div>
+
+      <!-- After typing done -->
+      <hr class="divider hidden" id="div1">
+
+      <div class="hidden" id="contact-section">
+        <div class="line"><span class="prompt">C:\access&gt;</span> <span class="white">whoami --sender</span></div>
+        <div class="line gap dim">Sender information:</div>
+
+        <div class="contact-block">
+          <div class="contact-name" id="contact-name">---</div>
+          <div class="contact-links" id="contact-links"></div>
+        </div>
+      </div>
+
+      <div class="statusbar hidden" id="statusbar">
+        <span>EOF</span>
+        <span id="status-date"></span>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const raw = sessionStorage.getItem('userData');
+    if (!raw) { window.location.href = 'index.html'; }
+    const data = JSON.parse(raw);
+
+    // Timestamp
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const ts = `${pad(now.getDate())}-${months[now.getMonth()]}-${now.getFullYear()}  ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    document.getElementById('ts').textContent = ts;
+    document.getElementById('status-date').textContent = ts;
+
+    // Greeting
+    document.getElementById('greeting').textContent = 'สวัสดี, ' + data.name + '.';
+    document.getElementById('code-label').textContent = 'Code: ' + data.code;
+
+    // Contact
+    document.getElementById('contact-name').textContent = '> ' + data.contact.name;
+
+    const links = [
+      { key: 'instagram', label: 'Instagram' },
+      { key: 'facebook', label: 'Facebook' },
+      { key: 'discord', label: 'Discord' },
+      { key: 'tiktok', label: 'TikTok' },
+    ];
+
+    const linksEl = document.getElementById('contact-links');
+    links.forEach(l => {
+      const linkData = data.contact[l.key];
+      if (!linkData) return;
+      const url = typeof linkData === 'string' ? linkData : linkData.url;
+      const displayText = typeof linkData === 'string' ? url.replace(/^https?:\/\//, '') : linkData.display;
+      if (!url) return;
+      const a = document.createElement('a');
+      a.className = 'contact-link';
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+
+      a.innerHTML = `<span class="lbl">${l.label}</span><span>${displayText}</span>`;
+      linksEl.appendChild(a);
+    });
+
+    // Typing
+    const msgEl = document.getElementById('msg-text');
+    const cursorEl = document.getElementById('cursor');
+    const text = data.message;
+    let i = 0;
+
+    function show(id) {
+      const el = document.getElementById(id);
+      el.classList.remove('hidden');
+      el.classList.add('visible');
+    }
+
+    function type() {
+      if (i < text.length) {
+        msgEl.textContent += text[i++];
+        setTimeout(type, 25);
+      } else {
+        cursorEl.style.display = 'none';
+        setTimeout(() => {
+          show('div1');
+          show('contact-section');
+          show('statusbar');
+        }, 400);
+      }
+    }
+
+    setTimeout(type, 800);
+  </script>
+</body>
+
+</html>

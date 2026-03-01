@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>congrat-terminal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Sarabun:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0c0c0c;
+      color: #cccccc;
+      font-family: 'Share Tech Mono', 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .window {
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    /* Title bar */
+    .titlebar {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      padding: 5px 10px;
+      font-size: 12px;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0;
+    }
+
+    /* Terminal body */
+    .terminal {
+      background: #0c0c0c;
+      border: 1px solid #333;
+      border-top: none;
+      padding: 20px 16px;
+      min-height: calc(100vh - 80px);
+    }
+
+    .line {
+      margin-bottom: 4px;
+    }
+
+    .line.gap {
+      margin-bottom: 12px;
+    }
+
+    .prompt {
+      color: #4ec94e;
+    }
+
+    .dim {
+      color: #555;
+    }
+
+    .white {
+      color: #e0e0e0;
+    }
+
+    .yellow {
+      color: #d4a017;
+    }
+
+    .red {
+      color: #cc4444;
+    }
+
+    /* Countdown */
+    .countdown-row {
+      display: flex;
+      gap: 24px;
+      margin: 8px 0 4px;
+      flex-wrap: wrap;
+    }
+
+    .cd-cell {
+      text-align: center;
+      min-width: 48px;
+    }
+
+    .cd-num {
+      font-size: 28px;
+      color: #e0e0e0;
+      line-height: 1;
+    }
+
+    .cd-unit {
+      font-size: 10px;
+      color: #555;
+      letter-spacing: 1px;
+      margin-top: 2px;
+    }
+    
+    /* Input */
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      border-top: 1px solid #1e1e1e;
+      padding-top: 16px;
+    }
+
+    input[type="text"] {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #444;
+      color: #e0e0e0;
+      font-family: inherit;
+      font-size: 14px;
+      letter-spacing: 3px;
+      padding: 4px 2px;
+      outline: none;
+      flex: 1;
+      caret-color: #4ec94e;
+      text-transform: uppercase;
+    }
+
+    input[type="text"]::placeholder {
+      color: #333;
+      letter-spacing: 1px;
+    }
+
+    button {
+      background: transparent;
+      border: 1px solid #444;
+      color: #aaa;
+      font-family: inherit;
+      font-size: 12px;
+      padding: 5px 14px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      border-color: #888;
+      color: #e0e0e0;
+      background: #1a1a1a;
+    }
+
+    button:active {
+      background: #222;
+    }
+
+    .error {
+      color: #cc4444;
+      margin-top: 8px;
+      font-size: 12px;
+      display: none;
+    }
+
+    .statusbar {
+      border-top: 1px solid #1e1e1e;
+      margin-top: 20px;
+      padding-top: 8px;
+      font-size: 11px;
+      color: #444;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    @media (max-width: 400px) {
+      .cd-num {
+        font-size: 22px;
+      }
+
+      .countdown-row {
+        gap: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <script src="config.js"></script>
+
+  <div class="window">
+
+    <div class="titlebar">
+      <span>C:\access\congratulations.exe</span>
+      <span id="live-clock">--:--:--</span>
+    </div>
+
+    <div class="terminal" id="terminal">
+
+      <div class="line dim">UDTC College IT [Version 67.1.673190100]</div>
+      <div class="line dim gap">(c) Udonthani Technical College. All rights reserved.</div>
+
+      <div class="line"><span class="prompt">C:\access&gt;</span> <span class="white">auth.exe --init</span></div>
+      <div class="line gap dim">Initializing authentication module...</div>
+
+      <!-- LOCKED -->
+      <div id="locked-section" style="display:none">
+        <div class="line"><span class="prompt">C:\access&gt;</span> <span class="white">status --check</span></div>
+        <div class="line gap dim">Checking unlock conditions...</div>
+
+        <div class="line yellow">[LOCKED] <span id="locked-msg" style="font-family: 'Sarabun', sans-serif;"></span></div>
+        <div class="line dim">Unlock scheduled: <span class="white" id="unlock-date-str"></span></div>
+        <div class="line gap dim">Time remaining:</div>
+
+        <div class="countdown-row">
+          <div class="cd-cell">
+            <div class="cd-num" id="cd-d">00</div>
+            <div class="cd-unit">DAYS</div>
+          </div>
+          <div class="cd-cell">
+            <div class="cd-num" id="cd-h">00</div>
+            <div class="cd-unit">HRS</div>
+          </div>
+          <div class="cd-cell">
+            <div class="cd-num" id="cd-m">00</div>
+            <div class="cd-unit">MIN</div>
+          </div>
+          <div class="cd-cell">
+            <div class="cd-num" id="cd-s">00</div>
+            <div class="cd-unit">SEC</div>
+          </div>
+        </div>
+
+        <div class="line gap"></div>
+        <div class="line dim">Access denied. Please return after the scheduled time.</div>
+      </div>
+
+      <!-- UNLOCKED -->
+      <div id="input-section" style="display:none">
+        <div class="line"><span class="prompt">C:\access&gt;</span> <span class="white">status --check</span></div>
+        <div class="line gap dim">Checking unlock conditions...</div>
+
+        <div class="line">[OK] System unlocked. Authentication available.</div>
+        <div class="line gap dim">Enter your personal access code to continue.</div>
+
+        <div class="input-row">
+          <span class="prompt">C:\access&gt;</span>
+          <input type="text" id="code-input" placeholder="enter code..." maxlength="20" autocomplete="off"
+            spellcheck="false">
+          <button onclick="submitCode()">ENTER</button>
+        </div>
+        <div class="error" id="error-msg">Access denied. Invalid code.</div>
+      </div>
+
+      <div class="statusbar">
+        <span id="status-left">READY</span>
+        <span id="status-right"></span>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const unlockDate = new Date(CONFIG.unlockDate);
+    const pad = n => String(n).padStart(2, '0');
+
+    // Clock
+    function tick() {
+      const n = new Date();
+      document.getElementById('live-clock').textContent =
+        `${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
+    }
+    setInterval(tick, 1000); tick();
+
+    // Status right
+    function setStatus() {
+      const n = new Date();
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      document.getElementById('status-right').textContent =
+        `${pad(n.getDate())}-${months[n.getMonth()]}-${n.getFullYear()}`;
+    }
+    setStatus();
+
+    // Format unlock date
+    function fmtDate(d) {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return `${pad(d.getDate())} ${months[d.getMonth()]} ${d.getFullYear()}  ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    // Countdown
+    function updateCountdown() {
+      const diff = unlockDate - new Date();
+      if (diff <= 0) { location.reload(); return; }
+      document.getElementById('cd-d').textContent = pad(Math.floor(diff / 86400000));
+      document.getElementById('cd-h').textContent = pad(Math.floor((diff % 86400000) / 3600000));
+      document.getElementById('cd-m').textContent = pad(Math.floor((diff % 3600000) / 60000));
+      document.getElementById('cd-s').textContent = pad(Math.floor((diff % 60000) / 1000));
+    }
+
+    // Init
+    if (new Date() < unlockDate) {
+      document.getElementById('locked-section').style.display = '';
+      document.getElementById('locked-msg').textContent = CONFIG.lockedMessage;
+      document.getElementById('unlock-date-str').textContent = fmtDate(unlockDate);
+      document.getElementById('status-left').textContent = 'LOCKED';
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    } else {
+      document.getElementById('input-section').style.display = '';
+      document.getElementById('status-left').textContent = 'UNLOCKED';
+      setTimeout(() => document.getElementById('code-input').focus(), 100);
+      document.getElementById('code-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') submitCode();
+      });
+    }
+
+    function submitCode() {
+      const val = document.getElementById('code-input').value.trim().toUpperCase();
+      const err = document.getElementById('error-msg');
+      if (CONFIG.codes[val]) {
+        sessionStorage.setItem('userData', JSON.stringify({
+          code: val,
+          name: CONFIG.codes[val].name,
+          message: CONFIG.codes[val].message,
+          contact: CONFIG.contact
+        }));
+        window.location.href = 'message.html';
+      } else {
+        err.style.display = 'block';
+        document.getElementById('code-input').value = '';
+        document.getElementById('code-input').focus();
+        setTimeout(() => err.style.display = 'none', 3000);
+      }
+    }
+  </script>
+</body>
+
+</html>
